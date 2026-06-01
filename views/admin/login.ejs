@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login – RSVP App</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="card login-card">
+      <div class="login-logo">
+        <div class="logo-icon">🎉</div>
+        <h1>RSVP App</h1>
+        <p>Admin Login</p>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert--error">⚠️ <%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/admin/login">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-group">
+          <label for="password">Admin Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            placeholder="Enter admin password"
+            autofocus
+            required
+          >
+        </div>
+        <button type="submit" class="btn btn--primary btn--full mt-2">
+          🔐 Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

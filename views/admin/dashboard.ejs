@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard – RSVP App</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-body { padding: 2rem 0 4rem; }
+    .section + .section { margin-top: 2.5rem; }
+    .guest-name { font-weight: 700; }
+    .guest-email { color: var(--muted); font-size: .88rem; }
+    .action-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
+    .invite-cell { max-width: 300px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container container--lg navbar__inner">
+      <a href="/admin/dashboard" class="navbar__brand">🎉 RSVP Admin</a>
+      <div class="navbar__links">
+        <a href="/admin/rsvps" class="btn btn--ghost btn--sm">📋 View RSVPs</a>
+        <a href="/admin/logout" class="btn btn--outline btn--sm">Sign Out</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-body">
+    <div class="container container--lg">
+
+      <!-- Flash messages -->
+      <% if (successMessage) { %>
+        <div class="alert alert--success mt-2">
+          ✅ <%= successMessage %>
+          <% const linkMatch = successMessage.match(/Link:\s*(\S+)/); %>
+          <% if (linkMatch) { %>
+            <div class="invite-link-box mt-1"><%= linkMatch[1] %></div>
+          <% } %>
+        </div>
+      <% } %>
+      <% if (errorMessage) { %>
+        <div class="alert alert--error mt-2">⚠️ <%= errorMessage %></div>
+      <% } %>
+
+      <!-- Stats -->
+      <div class="stats-grid mt-3">
+        <div class="stat-card">
+          <div class="stat-card__num"><%= guests.length %></div>
+          <div class="stat-card__label">Total Guests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__num"><%= guests.filter(g => g.invite_sent).length %></div>
+          <div class="stat-card__label">Invites Sent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__num"><%= totalRsvps %></div>
+          <div class="stat-card__label">RSVPs Received</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__num"><%= rsvpCount %></div>
+          <div class="stat-card__label">Attending</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <!-- Event details -->
+        <div class="card">
+          <div class="card__title">📅 Event Details</div>
+          <% if (event) { %>
+          <form method="POST" action="/admin/event/update">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Event Name</label>
+                <input type="text" name="name" class="form-control" value="<%= event.name %>" required>
+              </div>
+              <div class="form-group">
+                <label>Date &amp; Time</label>
+                <input type="text" name="date" class="form-control" value="<%= event.date %>" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Venue</label>
+              <input type="text" name="venue" class="form-control" value="<%= event.venue %>" required>
+            </div>
+            <div class="form-group">
+              <label>Description</label>
+              <textarea name="description" class="form-control" rows="2"><%= event.description %></textarea>
+            </div>
+            <button type="submit" class="btn btn--ghost btn--sm">💾 Save Changes</button>
+          </form>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="section">
+        <!-- Add guest -->
+        <div class="card">
+          <div class="card__title">➕ Add Guest</div>
+          <form method="POST" action="/admin/guests/add">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" class="form-control" placeholder="Jane Doe" required>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" placeholder="jane@example.com" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn--primary btn--sm">Add Guest</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="section">
+        <!-- Guests list -->
+        <div class="card">
+          <div class="card__title">👥 Guest List</div>
+          <% if (guests.length === 0) { %>
+            <p class="text-muted">No guests added yet. Add your first guest above.</p>
+          <% } else { %>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Invite Status</th>
+                  <th>Invite Link</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% guests.forEach((guest, i) => { %>
+                <tr>
+                  <td><%= i + 1 %></td>
+                  <td class="guest-name"><%= guest.name %></td>
+                  <td class="guest-email"><%= guest.email %></td>
+                  <td>
+                    <% if (guest.invite_sent) { %>
+                      <span class="badge badge--sent">✅ Sent</span>
+                    <% } else { %>
+                      <span class="badge badge--pending">⏳ Pending</span>
+                    <% } %>
+                  </td>
+                  <td class="invite-cell">
+                    <% if (guest.invite_token) { %>
+                      <span class="invite-link-box">/invite/<%= guest.invite_token.substring(0,8) %>…</span>
+                    <% } else { %>
+                      <span class="text-muted">—</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="action-btns">
+                      <!-- Send / Resend invite -->
+                      <form method="POST" action="/admin/guests/<%= guest.id %>/invite" style="display:inline">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn btn--primary btn--sm">
+                          <%= guest.invite_sent ? '🔄 Resend' : '📨 Send Invite' %>
+                        </button>
+                      </form>
+                      <!-- Delete guest -->
+                      <form method="POST" action="/admin/guests/<%= guest.id %>/delete" style="display:inline"
+                            onsubmit="return confirm('Remove <%= guest.name %>?')">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn btn--danger btn--sm">🗑</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>RSVP App &mdash; Admin Panel</p>
+  </footer>
+</body>
+</html>

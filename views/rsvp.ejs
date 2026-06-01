@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSVP – <%= event ? event.name : 'RSVP Form' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .rsvp-page { min-height: 100vh; padding: 2.5rem 1rem 4rem; }
+    .rsvp-header { text-align: center; margin-bottom: 2rem; }
+    .rsvp-header h1 { font-size: 1.7rem; font-weight: 900; color: var(--text); }
+    .rsvp-header p  { color: var(--muted); }
+    .back-link { display: inline-flex; align-items: center; gap: .35rem; color: var(--primary); text-decoration: none; font-size: .9rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="rsvp-page">
+    <div class="container container--sm">
+
+      <!-- Back to landing page -->
+      <a href="/invite/<%= guest.invite_token %>" class="back-link">← Back to Invitation</a>
+
+      <div class="rsvp-header">
+        <div style="font-size:2.8rem;margin-bottom:.5rem">🎟️</div>
+        <h1>RSVP Form</h1>
+        <% if (event) { %>
+          <p><strong><%= event.name %></strong> &mdash; <%= event.date %></p>
+        <% } %>
+      </div>
+
+      <% if (success) { %>
+        <!-- ─── Success State ──────────────────────────────────── -->
+        <div class="card">
+          <div class="success-wrap">
+            <div class="success-icon">🎉</div>
+            <h2>Thank you, <%= guest.name %>!</h2>
+            <% if (existingRsvp && existingRsvp.attending === 'yes') { %>
+              <p>We're thrilled you'll be joining us. See you there!</p>
+            <% } else if (existingRsvp && existingRsvp.attending === 'no') { %>
+              <p>We're sorry you can't make it. You'll be missed!</p>
+            <% } else { %>
+              <p>Your RSVP has been recorded. We'll keep you posted!</p>
+            <% } %>
+            <div class="mt-3" style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+              <a href="/invite/<%= guest.invite_token %>" class="btn btn--ghost">← Back to Invitation</a>
+              <a href="/rsvp/<%= guest.invite_token %>" class="btn btn--outline">✏️ Update RSVP</a>
+            </div>
+          </div>
+        </div>
+
+      <% } else { %>
+        <!-- ─── RSVP Form ──────────────────────────────────────── -->
+        <% if (error) { %>
+          <div class="alert alert--error">⚠️ <%= error %></div>
+        <% } %>
+
+        <% if (existingRsvp) { %>
+          <div class="alert alert--info">
+            ℹ️ You've already responded. Fill out the form below to update your RSVP.
+          </div>
+        <% } %>
+
+        <div class="card">
+          <form method="POST" action="/rsvp/<%= guest.invite_token %>">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <!-- Guest greeting -->
+            <div class="form-group">
+              <label>Your Name</label>
+              <input type="text" class="form-control" value="<%= guest.name %>" readonly style="background:#f9f9f9;cursor:default">
+            </div>
+
+            <!-- Attendance -->
+            <div class="form-group">
+              <label>Will you be attending? <span style="color:var(--accent)">*</span></label>
+              <div class="attendance-options">
+                <div class="attendance-option attendance-option--yes">
+                  <input type="radio" id="att-yes" name="attending" value="yes"
+                    <%= existingRsvp && existingRsvp.attending === 'yes' ? 'checked' : '' %> required>
+                  <label for="att-yes">
+                    <span class="emoji">✅</span>
+                    Yes, I'll be there!
+                  </label>
+                </div>
+                <div class="attendance-option attendance-option--no">
+                  <input type="radio" id="att-no" name="attending" value="no"
+                    <%= existingRsvp && existingRsvp.attending === 'no' ? 'checked' : '' %>>
+                  <label for="att-no">
+                    <span class="emoji">❌</span>
+                    Sorry, can't make it
+                  </label>
+                </div>
+                <div class="attendance-option attendance-option--maybe">
+                  <input type="radio" id="att-maybe" name="attending" value="maybe"
+                    <%= existingRsvp && existingRsvp.attending === 'maybe' ? 'checked' : '' %>>
+                  <label for="att-maybe">
+                    <span class="emoji">🤔</span>
+                    Maybe / Not sure yet
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Plus-ones -->
+            <div class="form-group" id="plusOnesGroup">
+              <label for="plus_ones">Number of additional guests (plus-ones)</label>
+              <input type="number" id="plus_ones" name="plus_ones" class="form-control"
+                min="0" max="10" value="<%= existingRsvp ? existingRsvp.plus_ones : 0 %>">
+            </div>
+
+            <!-- Dietary notes -->
+            <div class="form-group">
+              <label for="dietary_notes">Dietary requirements or allergies</label>
+              <input type="text" id="dietary_notes" name="dietary_notes" class="form-control"
+                placeholder="e.g. Vegetarian, nut allergy…"
+                value="<%= existingRsvp ? existingRsvp.dietary_notes : '' %>">
+            </div>
+
+            <!-- Message -->
+            <div class="form-group">
+              <label for="message">Message for the host (optional)</label>
+              <textarea id="message" name="message" class="form-control" rows="3"
+                placeholder="Looking forward to it!"><%= existingRsvp ? existingRsvp.message : '' %></textarea>
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full">
+              🎉 Submit RSVP
+            </button>
+          </form>
+        </div>
+      <% } %>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>RSVP App &mdash; <a href="/invite/<%= guest.invite_token %>" style="color:var(--primary)">← Back to invitation</a></p>
+  </footer>
+
+  <script>
+    // Hide plus-ones when attending is "no"
+    const radios = document.querySelectorAll('input[name="attending"]');
+    const plusGroup = document.getElementById('plusOnesGroup');
+    function updatePlusOnes() {
+      const val = document.querySelector('input[name="attending"]:checked');
+      if (plusGroup) {
+        plusGroup.style.display = val && val.value === 'no' ? 'none' : '';
+      }
+    }
+    radios.forEach(r => r.addEventListener('change', updatePlusOnes));
+    updatePlusOnes();
+  </script>
+</body>
+</html>
