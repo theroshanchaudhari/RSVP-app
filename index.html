@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RSVP App</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <h1 id="invite-title">You're invited!</h1>
+        <p id="invite-subtitle"></p>
+
+        <form id="rsvp-form">
+          <label>
+            Your response
+            <select id="response" required>
+              <option value="yes">Yes, attending</option>
+              <option value="no">Sorry, can't make it</option>
+              <option value="maybe">Maybe</option>
+            </select>
+          </label>
+          <button type="submit">Submit RSVP</button>
+        </form>
+
+        <p id="confirmation" aria-live="polite"></p>
+      </section>
+
+      <section class="card">
+        <h2>Create personalized invite link</h2>
+        <form id="invite-link-form">
+          <label>
+            Guest name
+            <input id="guest-name" required />
+          </label>
+          <label>
+            Event name
+            <input id="event-name" value="Our Celebration" required />
+          </label>
+          <label>
+            Event date
+            <input id="event-date" type="date" />
+          </label>
+          <label>
+            Host name
+            <input id="host-name" value="Your Host" />
+          </label>
+          <button type="submit">Generate link</button>
+        </form>
+
+        <label>
+          Shareable invite link
+          <input id="invite-link" readonly />
+        </label>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
