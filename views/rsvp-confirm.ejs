@@ -1,0 +1,83 @@
+<%- include('partials/header', { title: 'RSVP Confirmed' }) %>
+
+<div class="container py-5" style="max-width:600px;">
+  <div class="card shadow-sm text-center">
+    <div class="card-body p-5">
+      <div style="font-size:4rem;">
+        <% if (guest.attending === 'yes') { %>🎉<% } else if (guest.attending === 'no') { %>💔<% } else { %>🤔<% } %>
+      </div>
+      <h1 class="mt-3 fw-bold text-purple">
+        <% if (guest.attending === 'yes') { %>
+          You're coming!
+        <% } else if (guest.attending === 'no') { %>
+          We'll miss you!
+        <% } else { %>
+          Got it!
+        <% } %>
+      </h1>
+      <p class="lead">
+        <% if (guest.attending === 'yes') { %>
+          We're thrilled you'll be joining us at <strong><%= event.name %></strong>!
+        <% } else if (guest.attending === 'no') { %>
+          We're sorry you can't make it, <strong><%= guest.name %></strong>.
+        <% } else { %>
+          Thanks for letting us know, <strong><%= guest.name %></strong>. We'll keep your response noted.
+        <% } %>
+      </p>
+
+      <% if (guest.attending === 'yes') { %>
+      <div class="alert alert-light text-start mt-3">
+        <h6 class="fw-bold mb-2">Your RSVP Summary</h6>
+        <div class="row g-1 small">
+          <div class="col-6 text-muted">Party Size:</div>
+          <div class="col-6"><%= guest.adults %> adult(s), <%= guest.children %> child(ren)</div>
+          <% if (guest.meal_preference) { %>
+          <div class="col-6 text-muted">Meal:</div>
+          <div class="col-6"><%= guest.meal_preference %></div>
+          <% } %>
+          <% if (guest.dietary_restrictions) { %>
+          <div class="col-6 text-muted">Dietary:</div>
+          <div class="col-6"><%= guest.dietary_restrictions %></div>
+          <% } %>
+          <% if (guest.arrival_time) { %>
+          <div class="col-6 text-muted">Arrival:</div>
+          <div class="col-6"><%= guest.arrival_time %></div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+      <% if (event.date) { %>
+      <div class="mt-3 p-3 bg-light rounded">
+        <p class="mb-1 fw-bold"><i class="bi bi-calendar-heart me-2 text-purple"></i><%= event.date %><% if (event.time) { %> at <%= event.time %><% } %></p>
+        <% if (event.venue_name) { %><p class="mb-0 text-muted"><i class="bi bi-geo-alt me-2"></i><%= event.venue_name %></p><% } %>
+      </div>
+      <% } %>
+
+      <% if (guest.email) { %>
+      <p class="mt-3 text-muted small">
+        <i class="bi bi-envelope-check me-1"></i>A confirmation email has been sent to <strong><%= guest.email %></strong>.
+      </p>
+      <% } %>
+
+      <div class="mt-4 d-flex gap-2 justify-content-center flex-wrap">
+        <a href="<%= editUrl %>" class="btn btn-outline-purple">
+          <i class="bi bi-pencil me-2"></i>Edit My RSVP
+        </a>
+        <a href="/" class="btn btn-purple">
+          <i class="bi bi-house me-2"></i>Back to Event
+        </a>
+      </div>
+
+      <!-- WhatsApp Share -->
+      <div class="mt-3">
+        <a href="https://wa.me/?text=<%= encodeURIComponent("I just RSVP'd to " + event.name + "! Join me: " + editUrl.replace('/rsvp/edit/' + guest.edit_token, '/rsvp')) %>"
+           target="_blank" class="btn btn-success btn-sm">
+          <i class="bi bi-whatsapp me-1"></i>Share on WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
