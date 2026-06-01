@@ -30,6 +30,10 @@ app.use(
   })
 );
 
+if (isProd && !process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable must be set in production');
+}
+
 // --- CSRF Protection (double-submit cookie) -----------------------------------
 
 const CSRF_COOKIE = 'rsvp_csrf';
@@ -53,7 +57,7 @@ function generateCsrfToken(req, res) {
   const raw = crypto.randomBytes(24).toString('hex');
   const signed = raw + '.' + signCsrfToken(raw);
   res.cookie(CSRF_COOKIE, signed, {
-    httpOnly: false, // readable by the server-side CSRF middleware via cookie-parser
+    httpOnly: true,
     sameSite: 'lax',
     secure: isProd,
     maxAge: 24 * 60 * 60 * 1000,
@@ -263,7 +267,7 @@ app.post('/admin/event/update', requireAdmin, (req, res) => {
 // --- Guest: Landing Page -----------------------------------------------------
 // Guests land here FIRST when they click their invite link.
 
-app.get('/invite/:token', (req, res) => {
+app.get('/invite/:token', generalLimiter, (req, res) => {
   const { token } = req.params;
   const guest = db.prepare('SELECT * FROM guests WHERE invite_token = ?').get(token);
   if (!guest) {
@@ -284,7 +288,7 @@ app.get('/invite/:token', (req, res) => {
 // --- Guest: RSVP Form --------------------------------------------------------
 // Guests arrive here FROM the landing page.
 
-app.get('/rsvp/:token', (req, res) => {
+app.get('/rsvp/:token', generalLimiter, (req, res) => {
   const { token } = req.params;
   const guest = db.prepare('SELECT * FROM guests WHERE invite_token = ?').get(token);
   if (!guest) {
@@ -303,7 +307,7 @@ app.get('/rsvp/:token', (req, res) => {
   res.render('rsvp', { guest, event, existingRsvp, error: null, success: false, csrfToken });
 });
 
-app.post('/rsvp/:token', (req, res) => {
+app.post('/rsvp/:token', generalLimiter, (req, res) => {
   const { token } = req.params;
   const guest = db.prepare('SELECT * FROM guests WHERE invite_token = ?').get(token);
   if (!guest) {
