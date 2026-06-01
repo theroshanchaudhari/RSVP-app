@@ -4,7 +4,7 @@ Reusable RSVP app for events with personalized invite links.
 
 ## Run locally
 
-Open `/tmp/workspace/theroshanchaudhari/RSVP-app/index.html` in a browser.
+Open `index.html` in a browser.
 
 ## Personalized invite links
 
