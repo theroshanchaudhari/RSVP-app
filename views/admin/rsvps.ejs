@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSVP Responses – RSVP App</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .page-body { padding: 2rem 0 4rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container container--lg navbar__inner">
+      <a href="/admin/dashboard" class="navbar__brand">🎉 RSVP Admin</a>
+      <div class="navbar__links">
+        <a href="/admin/dashboard" class="btn btn--ghost btn--sm">← Dashboard</a>
+        <a href="/admin/logout" class="btn btn--outline btn--sm">Sign Out</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page-body">
+    <div class="container container--lg">
+      <h2 class="section-title mt-3">📋 RSVP Responses</h2>
+      <% if (event) { %>
+        <p>Event: <strong><%= event.name %></strong> &mdash; <%= event.date %></p>
+      <% } %>
+
+      <% if (rsvps.length === 0) { %>
+        <div class="card mt-3">
+          <p class="text-muted text-center">No RSVPs received yet.</p>
+        </div>
+      <% } else { %>
+        <div class="table-wrapper mt-3">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Guest Name</th>
+                <th>Email</th>
+                <th>Attending</th>
+                <th>+1s</th>
+                <th>Dietary Notes</th>
+                <th>Message</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% rsvps.forEach((r, i) => { %>
+              <tr>
+                <td><%= i + 1 %></td>
+                <td><strong><%= r.guest_name %></strong></td>
+                <td><span style="color:var(--muted)"><%= r.guest_email %></span></td>
+                <td>
+                  <span class="badge badge--<%= r.attending %>">
+                    <%= r.attending === 'yes' ? '✅ Yes' : r.attending === 'no' ? '❌ No' : '🤔 Maybe' %>
+                  </span>
+                </td>
+                <td><%= r.plus_ones > 0 ? '+' + r.plus_ones : '—' %></td>
+                <td><%= r.dietary_notes || '—' %></td>
+                <td><%= r.message || '—' %></td>
+                <td style="white-space:nowrap;font-size:.82rem;color:var(--muted)"><%= r.submitted_at %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>RSVP App &mdash; Admin Panel</p>
+  </footer>
+</body>
+</html>

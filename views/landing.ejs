@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Invited! – <%= event ? event.name : 'RSVP App' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .welcome-section { padding: 3rem 0 2rem; }
+    .welcome-card { max-width: 680px; margin: 0 auto; text-align: center; }
+    .welcome-greeting {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: .4rem;
+    }
+    .welcome-name {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .welcome-name span { color: var(--primary); }
+    .welcome-body {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 540px;
+      margin: 0 auto 2rem;
+    }
+    .rsvp-cta {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+    }
+    .rsvp-cta .hint { font-size: .83rem; color: var(--muted); }
+    .already-rsvpd { padding: 3rem 0 1rem; }
+    .already-rsvpd .card { max-width: 580px; margin: 0 auto; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Hero ──────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__eyebrow">✉️ Personal Invitation</div>
+    <h1 class="hero__title">
+      <% if (event) { %><%= event.name %><% } else { %>You're Invited!<% } %>
+    </h1>
+    <p class="hero__subtitle">
+      <% if (event) { %><%= event.description || 'We would love to celebrate with you.' %><% } %>
+    </p>
+    <div class="hero__actions">
+      <a href="/rsvp/<%= guest.invite_token %>" class="hero__btn-primary">
+        🎟️ RSVP Now
+      </a>
+      <a href="#details" class="hero__btn-secondary">
+        📅 View Details
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── Welcome Message ───────────────────────────────────────────────────── -->
+  <section class="welcome-section">
+    <div class="container">
+      <div class="welcome-card">
+        <p class="welcome-greeting">Dear</p>
+        <h2 class="welcome-name"><span><%= guest.name %></span>,</h2>
+        <p class="welcome-body">
+          We are delighted to invite you to join us for
+          <% if (event) { %><strong><%= event.name %></strong><% } else { %>our special event<% } %>.
+          Your presence would mean the world to us.
+          Please take a moment to let us know if you will be joining.
+        </p>
+
+        <% if (existingRsvp) { %>
+          <div class="alert alert--info" style="text-align:left;max-width:420px;margin:0 auto 1.5rem">
+            <div>
+              📬 You've already RSVP'd as
+              <span class="rsvp-status-badge rsvp-status-badge--<%= existingRsvp.attending %>">
+                <%= existingRsvp.attending === 'yes' ? '✅ Attending' : existingRsvp.attending === 'no' ? '❌ Not Attending' : '🤔 Maybe' %>
+              </span>
+            </div>
+            <div class="mt-1" style="font-size:.88rem">You can update your response anytime.</div>
+          </div>
+        <% } %>
+
+        <div class="rsvp-cta">
+          <a href="/rsvp/<%= guest.invite_token %>" class="btn btn--primary btn--lg">
+            🎟️ <%= existingRsvp ? 'Update My RSVP' : 'RSVP Now' %>
+          </a>
+          <span class="hint">Takes less than a minute</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Event Details ─────────────────────────────────────────────────────── -->
+  <% if (event) { %>
+  <section class="event-details" id="details">
+    <div class="container">
+      <h2 class="section-title text-center">Event Details</h2>
+      <p class="text-center text-muted">Everything you need to know about the event</p>
+      <div class="event-details__grid">
+        <div class="event-detail-card">
+          <div class="icon">📅</div>
+          <div class="label">Date &amp; Time</div>
+          <div class="value"><%= event.date %></div>
+        </div>
+        <div class="event-detail-card">
+          <div class="icon">📍</div>
+          <div class="label">Venue</div>
+          <div class="value"><%= event.venue %></div>
+        </div>
+        <div class="event-detail-card">
+          <div class="icon">🎉</div>
+          <div class="label">Event</div>
+          <div class="value"><%= event.name %></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- ─── Final CTA ─────────────────────────────────────────────────────────── -->
+  <section style="padding: 3rem 0; text-align: center; background: #f5f3ff;">
+    <div class="container">
+      <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:.6rem">Ready to confirm?</h3>
+      <p class="text-muted" style="margin-bottom:1.5rem">Click the button below to fill out the RSVP form</p>
+      <a href="/rsvp/<%= guest.invite_token %>" class="btn btn--primary btn--lg">
+        🎟️ Go to RSVP Form →
+      </a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>You received this invitation because you are a valued guest.</p>
+  </footer>
+</body>
+</html>
