@@ -62,6 +62,7 @@
                 </a>
                 <form action="/admin/invitations/<%= inv.id %>/delete" method="POST"
                       onsubmit="return confirm('Delete this invitation?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button class="btn btn-outline-danger btn-xs" title="Delete">
                     <i class="bi bi-trash"></i>
                   </button>

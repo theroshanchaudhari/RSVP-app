@@ -19,6 +19,7 @@ const { initDB } = require('./config/database');
 const publicRoutes = require('./routes/public');
 const adminRoutes = require('./routes/admin');
 const { sendDailySummary } = require('./services/emailService');
+const { csrfProtection } = require('./middleware/csrf');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,8 +48,16 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'rsvp-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  }
 }));
+
+// CSRF protection (must come after session and body parsing)
+app.use(csrfProtection);
 
 // Routes
 app.use('/', publicRoutes);
@@ -79,7 +88,8 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`✅ RSVP App running at http://localhost:${PORT}`);
     console.log(`   Admin panel: http://localhost:${PORT}/admin`);
-    console.log(`   Default admin: ${process.env.ADMIN_EMAIL || 'admin@example.com'} / ${process.env.ADMIN_PASSWORD || 'changeme123'}`);
+    console.log(`   Default admin email: ${process.env.ADMIN_EMAIL || 'admin@example.com'}`);
+    console.log('   (Change the default password via Admin → Settings on first login)');
   });
 }
 

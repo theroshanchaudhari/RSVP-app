@@ -120,6 +120,7 @@
                 </a>
                 <form action="/admin/guests/<%= g.id %>/delete" method="POST"
                       onsubmit="return confirm('Delete <%= g.name %>?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button class="btn btn-outline-danger btn-xs" title="Delete">
                     <i class="bi bi-trash"></i>
                   </button>

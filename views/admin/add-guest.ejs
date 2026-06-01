@@ -16,6 +16,7 @@
 <div class="card shadow-sm border-0" style="max-width:700px;">
   <div class="card-body p-4">
     <form action="/admin/guests/add" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
       <h6 class="text-purple fw-bold mb-3">Guest Information</h6>
       <div class="row g-3 mb-4">

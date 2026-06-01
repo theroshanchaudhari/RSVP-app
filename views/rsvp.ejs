@@ -19,6 +19,7 @@
   <div class="card shadow-sm">
     <div class="card-body p-4">
       <form action="/rsvp" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <% if (token) { %><input type="hidden" name="invite_token" value="<%= token %>"><% } %>
 
         <!-- Attendance -->

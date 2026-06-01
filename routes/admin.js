@@ -1,13 +1,31 @@
 'use strict';
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const ctrl = require('../controllers/adminController');
 const { requireAdmin } = require('../middleware/adminAuth');
 
+// Rate limiters
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: 'Too many login attempts. Please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const exportLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: 'Too many export requests. Please try again shortly.',
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Auth
 router.get('/login', ctrl.showLogin);
-router.post('/login', ctrl.login);
+router.post('/login', loginLimiter, ctrl.login);
 router.post('/logout', requireAdmin, ctrl.logout);
 
 // Dashboard
@@ -24,7 +42,7 @@ router.post('/guests/:id/delete', requireAdmin, ctrl.deleteGuestHandler);
 router.post('/guests/:id/remind', requireAdmin, ctrl.sendReminder);
 
 // CSV Export
-router.get('/guests/export/csv', requireAdmin, ctrl.exportCsv);
+router.get('/guests/export/csv', requireAdmin, exportLimiter, ctrl.exportCsv);
 
 // Invitations
 router.get('/invitations', requireAdmin, ctrl.invitationList);

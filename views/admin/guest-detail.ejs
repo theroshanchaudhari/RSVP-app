@@ -20,6 +20,7 @@
     </button>
     <form action="/admin/guests/<%= guest.id %>/delete" method="POST"
           onsubmit="return confirm('Delete this guest?')">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button class="btn btn-outline-danger btn-sm">
         <i class="bi bi-trash me-1"></i>Delete
       </button>
@@ -102,6 +103,7 @@
       </div>
       <div class="card-body">
         <form action="/admin/guests/<%= guest.id %>/edit" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <!-- Hidden fields to preserve data -->
           <input type="hidden" name="name" value="<%= guest.name %>">
           <input type="hidden" name="email" value="<%= guest.email || '' %>">
