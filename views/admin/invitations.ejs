@@ -1,0 +1,116 @@
+<%- include('partials/header', { title: 'Invitations', activePage: 'invitations' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold text-purple mb-1"><i class="bi bi-envelope me-2"></i>Invitations</h2>
+    <p class="text-muted mb-0">Manage personal invite links with unique tokens</p>
+  </div>
+  <a href="/admin/invitations/add" class="btn btn-purple btn-sm">
+    <i class="bi bi-plus me-1"></i>Create Invitation
+  </a>
+</div>
+
+<% if (invitations.length === 0) { %>
+  <div class="card shadow-sm border-0 text-center py-5">
+    <div style="font-size:3rem;">✉️</div>
+    <p class="text-muted mt-2">No invitations created yet.</p>
+    <a href="/admin/invitations/add" class="btn btn-purple btn-sm mx-auto">Create First Invitation</a>
+  </div>
+<% } else { %>
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Name</th>
+            <th>Email / Phone</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% invitations.forEach(inv => { %>
+          <tr>
+            <td class="ps-3 fw-medium"><%= inv.name %></td>
+            <td>
+              <div class="small"><%= inv.email || '-' %></div>
+              <div class="small text-muted"><%= inv.phone || '' %></div>
+            </td>
+            <td>
+              <% if (inv.used) { %>
+                <span class="badge bg-success">Used</span>
+              <% } else { %>
+                <span class="badge bg-secondary">Pending</span>
+              <% } %>
+            </td>
+            <td class="small text-muted"><%= inv.created_at ? inv.created_at.substring(0, 10) : '-' %></td>
+            <td class="pe-3">
+              <div class="d-flex gap-1 flex-wrap">
+                <button class="btn btn-outline-secondary btn-xs" title="Copy link"
+                        onclick="copyInviteLink('<%= APP_URL %>/rsvp?token=<%= inv.invite_token %>')">
+                  <i class="bi bi-clipboard"></i>
+                </button>
+                <button class="btn btn-outline-info btn-xs" title="Show QR code"
+                        onclick="showQR(<%= inv.id %>)">
+                  <i class="bi bi-qr-code"></i>
+                </button>
+                <a href="<%= APP_URL %>/rsvp?token=<%= inv.invite_token %>" target="_blank"
+                   class="btn btn-outline-primary btn-xs" title="Open link">
+                  <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+                <form action="/admin/invitations/<%= inv.id %>/delete" method="POST"
+                      onsubmit="return confirm('Delete this invitation?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="btn btn-outline-danger btn-xs" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<!-- QR Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Invitation QR Code</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <div id="qrContent">Loading...</div>
+        <p class="small text-muted mt-2" id="qrUrl"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyInviteLink(url) {
+  navigator.clipboard.writeText(url).then(() => alert('Link copied!'));
+}
+
+function showQR(invId) {
+  const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+  document.getElementById('qrContent').innerHTML = 'Loading...';
+  modal.show();
+  fetch(`/admin/invitations/${invId}/qr`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('qrContent').innerHTML = `<img src="${data.qr}" class="img-fluid" style="max-width:200px;">`;
+      document.getElementById('qrUrl').textContent = data.url;
+    })
+    .catch(() => { document.getElementById('qrContent').innerHTML = 'Error generating QR'; });
+}
+</script>
+
+<%- include('partials/footer') %>

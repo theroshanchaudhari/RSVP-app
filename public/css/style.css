@@ -1,0 +1,179 @@
+/* ─── Color Palette ──────────────────────────────────────────── */
+:root {
+  --purple: #7c3aed;
+  --purple-dark: #5b21b6;
+  --purple-light: #ede9fe;
+}
+
+/* ─── Utilities ──────────────────────────────────────────────── */
+.text-purple { color: var(--purple) !important; }
+.bg-purple   { background-color: var(--purple) !important; }
+
+.btn-purple {
+  background-color: var(--purple);
+  border-color: var(--purple);
+  color: #fff;
+}
+.btn-purple:hover, .btn-purple:focus {
+  background-color: var(--purple-dark);
+  border-color: var(--purple-dark);
+  color: #fff;
+}
+
+.btn-outline-purple {
+  border-color: var(--purple);
+  color: var(--purple);
+}
+.btn-outline-purple:hover {
+  background-color: var(--purple);
+  color: #fff;
+}
+
+.border-purple { border: 2px solid var(--purple) !important; }
+
+.btn-xs {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* ─── Hero Section ───────────────────────────────────────────── */
+.hero-section {
+  background: linear-gradient(135deg, var(--purple) 0%, #a855f7 50%, #ec4899 100%);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  padding: 4rem 0;
+}
+
+.hero-emoji {
+  font-size: 4rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ─── Cards ──────────────────────────────────────────────────── */
+.card {
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+/* ─── Stat Cards ─────────────────────────────────────────────── */
+.stat-card {
+  border-radius: 12px;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+/* ─── RSVP Form Radio Buttons ────────────────────────────────── */
+.form-check-card {
+  padding-left: 0;
+}
+
+.form-check-card input[type="radio"] {
+  display: none;
+}
+
+.form-check-card input[type="radio"]:checked + label {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.form-check-card label {
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.form-check-card input[type="radio"]:checked + label.btn-outline-success {
+  background-color: #198754;
+  color: white;
+  box-shadow: 0 0 0 3px rgba(25,135,84,.3);
+}
+
+.form-check-card input[type="radio"]:checked + label.btn-outline-danger {
+  background-color: #dc3545;
+  color: white;
+  box-shadow: 0 0 0 3px rgba(220,53,69,.3);
+}
+
+.form-check-card input[type="radio"]:checked + label.btn-outline-warning {
+  background-color: #ffc107;
+  color: #212529;
+  box-shadow: 0 0 0 3px rgba(255,193,7,.3);
+}
+
+/* ─── Schedule Badge ─────────────────────────────────────────── */
+.schedule-time {
+  min-width: 80px;
+  text-align: center;
+  background: var(--purple-light);
+  color: var(--purple);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+}
+
+/* ─── Admin Sidebar ──────────────────────────────────────────── */
+.admin-sidebar {
+  background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.admin-sidebar .nav-link {
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: background 0.2s;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .active-nav {
+  background: rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+}
+
+/* ─── Alert Purple ───────────────────────────────────────────── */
+.alert-purple {
+  background-color: var(--purple-light);
+  border-color: var(--purple);
+  color: var(--purple-dark);
+}
+
+/* ─── Responsive Sidebar ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 60px !important;
+    overflow: hidden;
+  }
+  .admin-sidebar span,
+  .admin-sidebar .nav-link span,
+  .admin-sidebar .mt-auto a span,
+  .admin-sidebar .mt-auto button span {
+    display: none;
+  }
+  .admin-sidebar .nav-link {
+    text-align: center;
+    padding: 10px 0;
+  }
+}
+
+/* ─── Print-friendly ─────────────────────────────────────────── */
+@media print {
+  .admin-sidebar, .btn, .alert { display: none !important; }
+}

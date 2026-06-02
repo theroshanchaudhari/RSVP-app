@@ -1,0 +1,195 @@
+<%- include('partials/header', { title: '' }) %>
+
+<!-- Hero Section -->
+<section class="hero-section text-white text-center py-5">
+  <div class="container">
+    <div class="hero-emoji mb-3">🎉</div>
+    <h1 class="display-4 fw-bold"><%= event.name %></h1>
+    <% if (event.banner_message) { %>
+      <p class="lead mt-3"><%= event.banner_message %></p>
+    <% } %>
+    <% if (event.date) { %>
+      <p class="mt-2 fs-5">
+        <i class="bi bi-calendar-heart me-2"></i>
+        <%= event.date %><% if (event.time) { %> at <%= event.time %><% } %>
+      </p>
+    <% } %>
+    <% if (event.venue_name) { %>
+      <p class="fs-5">
+        <i class="bi bi-geo-alt me-2"></i>
+        <%= event.venue_name %>
+        <% if (event.city) { %>, <%= event.city %><% } %>
+      </p>
+    <% } %>
+    <div class="mt-4 d-flex gap-3 justify-content-center flex-wrap">
+      <a href="/rsvp" class="btn btn-light btn-lg px-5 fw-bold">
+        <i class="bi bi-envelope-heart me-2"></i>RSVP Now
+      </a>
+      <% if (event.rsvp_deadline) { %>
+        <span class="btn btn-outline-light btn-lg px-4">
+          <i class="bi bi-clock me-2"></i>Deadline: <%= event.rsvp_deadline %>
+        </span>
+      <% } %>
+    </div>
+    <!-- WhatsApp Share -->
+    <div class="mt-3">
+      <a href="https://wa.me/?text=<%= encodeURIComponent('You are invited to ' + event.name + '! RSVP here: ' + rsvpUrl) %>"
+         target="_blank" class="btn btn-success btn-sm me-2">
+        <i class="bi bi-whatsapp me-1"></i>Share on WhatsApp
+      </a>
+      <!-- Calendar Add -->
+      <% if (event.date) { %>
+        <a href="/calendar-event.ics" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-calendar-plus me-1"></i>Add to Calendar
+        </a>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- Event Details -->
+    <div class="col-lg-6">
+      <% if (event.description) { %>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-info-circle me-2"></i>About This Event</h4>
+          <p class="card-text"><%= event.description %></p>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Schedule / Timeline -->
+      <% if (schedule && schedule.length > 0) { %>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-clock me-2"></i>Schedule</h4>
+          <% if (event.puja_timing) { %>
+            <div class="d-flex gap-3 align-items-center mb-2">
+              <span class="badge bg-purple">Puja</span>
+              <span><%= event.puja_timing %></span>
+            </div>
+          <% } %>
+          <% if (event.lunch_timing) { %>
+            <div class="d-flex gap-3 align-items-center mb-2">
+              <span class="badge bg-purple">Lunch</span>
+              <span><%= event.lunch_timing %></span>
+            </div>
+          <% } %>
+          <ul class="list-group list-group-flush mt-2">
+            <% schedule.forEach(item => { %>
+              <li class="list-group-item d-flex gap-3 align-items-start border-0 px-0">
+                <span class="badge bg-light text-dark mt-1 schedule-time"><%= item.time %></span>
+                <span><%= item.description %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Venue -->
+      <% if (event.venue_name || event.venue_address) { %>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-pin-map me-2"></i>Venue</h4>
+          <% if (event.venue_name) { %><p class="fw-bold mb-1"><%= event.venue_name %></p><% } %>
+          <% if (event.venue_address) { %><p class="mb-1"><%= event.venue_address %></p><% } %>
+          <% if (event.city || event.state) { %>
+            <p class="mb-1"><%= [event.city, event.state, event.zip].filter(Boolean).join(', ') %></p>
+          <% } %>
+          <% if (event.parking_info) { %>
+            <p class="text-muted mt-2"><i class="bi bi-p-circle me-1"></i><%= event.parking_info %></p>
+          <% } %>
+          <% if (event.dress_code) { %>
+            <p class="text-muted"><i class="bi bi-suit2 me-1"></i>Dress Code: <strong><%= event.dress_code %></strong></p>
+          <% } %>
+          <% if (event.google_maps_url) { %>
+            <a href="<%= event.google_maps_url %>" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+              <i class="bi bi-map me-1"></i>View on Google Maps
+            </a>
+          <% } %>
+        </div>
+        <% if (event.google_maps_url && event.google_maps_url.includes('google.com/maps')) { %>
+        <div class="ratio ratio-16x9 rounded-bottom overflow-hidden">
+          <iframe src="<%= event.google_maps_url.replace('/maps?', '/maps/embed?') %>"
+                  style="border:0;" allowfullscreen loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="col-lg-6">
+      <!-- QR Code -->
+      <% if (qrCode) { %>
+      <div class="card shadow-sm mb-4 text-center">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-qr-code me-2"></i>Scan to RSVP</h4>
+          <img src="<%= qrCode %>" alt="RSVP QR Code" class="img-fluid" style="max-width:200px;">
+          <p class="text-muted mt-2 small">Scan this QR code to RSVP</p>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Contact -->
+      <% if (event.contact_name || event.contact_email || event.contact_phone) { %>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-person-lines-fill me-2"></i>Contact Host</h4>
+          <% if (event.contact_name) { %><p class="fw-bold mb-1"><%= event.contact_name %></p><% } %>
+          <% if (event.contact_email) { %>
+            <p class="mb-1"><i class="bi bi-envelope me-2"></i><a href="mailto:<%= event.contact_email %>"><%= event.contact_email %></a></p>
+          <% } %>
+          <% if (event.contact_phone) { %>
+            <p class="mb-1"><i class="bi bi-telephone me-2"></i><a href="tel:<%= event.contact_phone %>"><%= event.contact_phone %></a></p>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- FAQ -->
+      <% if (faq && faq.length > 0) { %>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h4 class="card-title text-purple"><i class="bi bi-question-circle me-2"></i>FAQ</h4>
+          <div class="accordion accordion-flush" id="faqAccordion">
+            <% faq.forEach((item, i) => { %>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#faq-<%= i %>">
+                  <%= item.question %>
+                </button>
+              </h2>
+              <div id="faq-<%= i %>" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body"><%= item.answer %></div>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- RSVP CTA Card -->
+      <div class="card shadow border-purple mb-4">
+        <div class="card-body text-center py-4">
+          <h4 class="text-purple fw-bold">Ready to RSVP?</h4>
+          <p class="text-muted">Let us know if you'll be joining us!</p>
+          <a href="/rsvp" class="btn btn-purple btn-lg px-5">
+            <i class="bi bi-envelope-heart me-2"></i>RSVP Now
+          </a>
+          <% if (event.rsvp_deadline) { %>
+            <p class="text-muted mt-2 small">Deadline: <%= event.rsvp_deadline %></p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

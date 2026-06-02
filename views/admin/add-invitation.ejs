@@ -1,0 +1,43 @@
+<%- include('partials/header', { title: 'Add Invitation', activePage: 'invitations' }) %>
+
+<div class="mb-4">
+  <a href="/admin/invitations" class="text-muted text-decoration-none small">
+    <i class="bi bi-arrow-left me-1"></i>Back to Invitations
+  </a>
+  <h2 class="fw-bold text-purple mb-0 mt-1"><i class="bi bi-envelope-plus me-2"></i>Create Invitation</h2>
+</div>
+
+<% if (errors && errors.length > 0) { %>
+<div class="alert alert-danger">
+  <ul class="mb-0"><% errors.forEach(e => { %><li><%= e %></li><% }) %></ul>
+</div>
+<% } %>
+
+<div class="card shadow-sm border-0" style="max-width:500px;">
+  <div class="card-body p-4">
+    <p class="text-muted small mb-4">Create a personal invitation with a unique link for this guest. They can use this link to RSVP directly.</p>
+    <form action="/admin/invitations/add" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="mb-3">
+        <label class="form-label">Guest Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" name="name" value="<%= formData.name || '' %>" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" value="<%= formData.email || '' %>">
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-control" name="phone" value="<%= formData.phone || '' %>">
+      </div>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-purple">
+          <i class="bi bi-plus me-2"></i>Create Invitation
+        </button>
+        <a href="/admin/invitations" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

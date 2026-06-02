@@ -1,0 +1,139 @@
+<%- include('partials/header', { title: 'Guests', activePage: 'guests' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h2 class="fw-bold text-purple mb-1"><i class="bi bi-people me-2"></i>Guest List</h2>
+    <p class="text-muted mb-0"><%= stats.total %> total &bull; <%= stats.attending %> attending &bull; <%= stats.notAttending %> not attending</p>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="/admin/guests/add" class="btn btn-purple btn-sm">
+      <i class="bi bi-person-plus me-1"></i>Add Guest
+    </a>
+    <a href="/admin/guests/export/csv" class="btn btn-outline-success btn-sm">
+      <i class="bi bi-download me-1"></i>Export CSV
+    </a>
+  </div>
+</div>
+
+<% if (typeof req !== 'undefined' && req.query) { %>
+<% } %>
+
+<!-- Search & Filter -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body">
+    <form method="GET" action="/admin/guests" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">Search</label>
+        <input type="text" class="form-control form-control-sm" name="search"
+               value="<%= filters.search || '' %>" placeholder="Name, email, or phone...">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Attending Status</label>
+        <select class="form-select form-select-sm" name="attending">
+          <option value="">All</option>
+          <option value="yes" <%= filters.attending === 'yes' ? 'selected' : '' %>>Attending</option>
+          <option value="no" <%= filters.attending === 'no' ? 'selected' : '' %>>Not Attending</option>
+          <option value="maybe" <%= filters.attending === 'maybe' ? 'selected' : '' %>>Maybe</option>
+          <option value="pending" <%= filters.attending === 'pending' ? 'selected' : '' %>>Pending</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Meal Preference</label>
+        <select class="form-select form-select-sm" name="meal_preference">
+          <option value="">All</option>
+          <option value="Vegetarian" <%= filters.meal_preference === 'Vegetarian' ? 'selected' : '' %>>Vegetarian</option>
+          <option value="Vegan" <%= filters.meal_preference === 'Vegan' ? 'selected' : '' %>>Vegan</option>
+          <option value="Non-Vegetarian" <%= filters.meal_preference === 'Non-Vegetarian' ? 'selected' : '' %>>Non-Vegetarian</option>
+          <option value="Jain" <%= filters.meal_preference === 'Jain' ? 'selected' : '' %>>Jain</option>
+          <option value="Gluten-Free" <%= filters.meal_preference === 'Gluten-Free' ? 'selected' : '' %>>Gluten-Free</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-purple btn-sm w-100">
+          <i class="bi bi-search me-1"></i>Filter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<% if (filters.search || filters.attending || filters.meal_preference) { %>
+<div class="mb-3">
+  <a href="/admin/guests" class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-x me-1"></i>Clear Filters
+  </a>
+  <span class="text-muted ms-2 small"><%= guests.length %> result(s)</span>
+</div>
+<% } %>
+
+<!-- Guest Table -->
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <% if (guests.length === 0) { %>
+      <div class="text-center py-5">
+        <div style="font-size:3rem;">👥</div>
+        <p class="text-muted mt-2">No guests found.</p>
+        <a href="/admin/guests/add" class="btn btn-purple btn-sm">Add First Guest</a>
+      </div>
+    <% } else { %>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Name</th>
+            <th>Email / Phone</th>
+            <th>Status</th>
+            <th>Party</th>
+            <th>Meal</th>
+            <th>Date</th>
+            <th class="pe-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% guests.forEach(g => { %>
+          <tr>
+            <td class="ps-3">
+              <a href="/admin/guests/<%= g.id %>" class="text-decoration-none fw-medium"><%= g.name %></a>
+              <% if (g.is_manual) { %><span class="badge bg-light text-muted ms-1 small">Manual</span><% } %>
+              <% if (g.private_notes) { %><i class="bi bi-sticky ms-1 text-warning" title="<%= g.private_notes %>"></i><% } %>
+            </td>
+            <td>
+              <div class="small"><%= g.email || '-' %></div>
+              <div class="small text-muted"><%= g.phone || '' %></div>
+            </td>
+            <td>
+              <% if (g.attending === 'yes') { %><span class="badge bg-success">Attending</span>
+              <% } else if (g.attending === 'no') { %><span class="badge bg-danger">Not Attending</span>
+              <% } else if (g.attending === 'maybe') { %><span class="badge bg-warning text-dark">Maybe</span>
+              <% } else { %><span class="badge bg-secondary">Pending</span><% } %>
+            </td>
+            <td class="small"><%= g.adults %>A / <%= g.children %>C</td>
+            <td class="small"><%= g.meal_preference || '-' %></td>
+            <td class="small text-muted"><%= g.created_at ? g.created_at.substring(0, 10) : '-' %></td>
+            <td class="pe-3">
+              <div class="d-flex gap-1">
+                <a href="/admin/guests/<%= g.id %>" class="btn btn-outline-secondary btn-xs" title="View">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="/admin/guests/<%= g.id %>/edit" class="btn btn-outline-primary btn-xs" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form action="/admin/guests/<%= g.id %>/delete" method="POST"
+                      onsubmit="return confirm('Delete <%= g.name %>?')">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button class="btn btn-outline-danger btn-xs" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

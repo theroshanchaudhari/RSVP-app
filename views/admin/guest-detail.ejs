@@ -1,0 +1,166 @@
+<%- include('partials/header', { title: guest.name, activePage: 'guests' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <a href="/admin/guests" class="text-muted text-decoration-none small">
+      <i class="bi bi-arrow-left me-1"></i>Back to Guests
+    </a>
+    <h2 class="fw-bold text-purple mb-0 mt-1"><%= guest.name %></h2>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="/admin/guests/<%= guest.id %>/edit" class="btn btn-outline-primary btn-sm">
+      <i class="bi bi-pencil me-1"></i>Edit
+    </a>
+    <a href="<%= editUrl %>" target="_blank" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-link-45deg me-1"></i>Guest Edit Link
+    </a>
+    <button class="btn btn-outline-info btn-sm" onclick="sendReminder(<%= guest.id %>)"
+            <% if (!guest.email) { %>disabled title="No email address"<% } %>>
+      <i class="bi bi-bell me-1"></i>Send Reminder
+    </button>
+    <form action="/admin/guests/<%= guest.id %>/delete" method="POST"
+          onsubmit="return confirm('Delete this guest?')">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn-outline-danger btn-sm">
+        <i class="bi bi-trash me-1"></i>Delete
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-person me-2 text-purple"></i>Guest Information
+      </div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5 text-muted">Name</dt>
+          <dd class="col-7"><%= guest.name %></dd>
+
+          <dt class="col-5 text-muted">Email</dt>
+          <dd class="col-7"><%= guest.email ? `<a href="mailto:${guest.email}">${guest.email}</a>` : '-' %></dd>
+
+          <dt class="col-5 text-muted">Phone</dt>
+          <dd class="col-7"><%= guest.phone || '-' %></dd>
+
+          <dt class="col-5 text-muted">Attending</dt>
+          <dd class="col-7">
+            <% if (guest.attending === 'yes') { %><span class="badge bg-success">Attending</span>
+            <% } else if (guest.attending === 'no') { %><span class="badge bg-danger">Not Attending</span>
+            <% } else if (guest.attending === 'maybe') { %><span class="badge bg-warning text-dark">Maybe</span>
+            <% } else { %><span class="badge bg-secondary">Pending</span><% } %>
+          </dd>
+
+          <dt class="col-5 text-muted">Adults</dt>
+          <dd class="col-7"><%= guest.adults %></dd>
+
+          <dt class="col-5 text-muted">Children</dt>
+          <dd class="col-7"><%= guest.children %></dd>
+
+          <dt class="col-5 text-muted">Meal Preference</dt>
+          <dd class="col-7"><%= guest.meal_preference || '-' %></dd>
+
+          <dt class="col-5 text-muted">Dietary Restrictions</dt>
+          <dd class="col-7"><%= guest.dietary_restrictions || '-' %></dd>
+
+          <dt class="col-5 text-muted">Arrival Time</dt>
+          <dd class="col-7"><%= guest.arrival_time || '-' %></dd>
+
+          <dt class="col-5 text-muted">RSVP Date</dt>
+          <dd class="col-7 small"><%= guest.created_at || '-' %></dd>
+
+          <dt class="col-5 text-muted">Last Updated</dt>
+          <dd class="col-7 small"><%= guest.updated_at || '-' %></dd>
+
+          <dt class="col-5 text-muted">Entry Type</dt>
+          <dd class="col-7">
+            <% if (guest.is_manual) { %><span class="badge bg-light text-dark">Manual</span>
+            <% } else { %><span class="badge bg-light text-dark">Self-RSVP</span><% } %>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <% if (guest.message) { %>
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-chat-heart me-2 text-purple"></i>Message to Host
+      </div>
+      <div class="card-body">
+        <p class="mb-0 fst-italic">"<%= guest.message %>"</p>
+      </div>
+    </div>
+    <% } %>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-sticky me-2 text-warning"></i>Private Notes</span>
+        <small class="text-muted">(only visible to admins)</small>
+      </div>
+      <div class="card-body">
+        <form action="/admin/guests/<%= guest.id %>/edit" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <!-- Hidden fields to preserve data -->
+          <input type="hidden" name="name" value="<%= guest.name %>">
+          <input type="hidden" name="email" value="<%= guest.email || '' %>">
+          <input type="hidden" name="phone" value="<%= guest.phone || '' %>">
+          <input type="hidden" name="attending" value="<%= guest.attending %>">
+          <input type="hidden" name="adults" value="<%= guest.adults %>">
+          <input type="hidden" name="children" value="<%= guest.children %>">
+          <input type="hidden" name="meal_preference" value="<%= guest.meal_preference || '' %>">
+          <input type="hidden" name="dietary_restrictions" value="<%= guest.dietary_restrictions || '' %>">
+          <input type="hidden" name="arrival_time" value="<%= guest.arrival_time || '' %>">
+          <input type="hidden" name="message" value="<%= guest.message || '' %>">
+          <div class="mb-2">
+            <textarea class="form-control form-control-sm" name="private_notes" rows="3"
+                      placeholder="Add private notes..."><%= guest.private_notes || '' %></textarea>
+          </div>
+          <button type="submit" class="btn btn-outline-warning btn-sm">
+            <i class="bi bi-save me-1"></i>Save Notes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-link-45deg me-2 text-purple"></i>Guest Edit Link
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-2">Share this link with the guest to let them edit their RSVP:</p>
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control" id="editLinkInput" value="<%= editUrl %>" readonly>
+          <button class="btn btn-outline-secondary" onclick="copyLink()">
+            <i class="bi bi-clipboard"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyLink() {
+  const input = document.getElementById('editLinkInput');
+  input.select();
+  document.execCommand('copy');
+  alert('Link copied to clipboard!');
+}
+
+function sendReminder(guestId) {
+  if (!confirm('Send a reminder email to this guest?')) return;
+  fetch(`/admin/guests/${guestId}/remind`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) alert('Reminder sent!');
+      else alert('Error: ' + data.error);
+    })
+    .catch(() => alert('Failed to send reminder.'));
+}
+</script>
+
+<%- include('partials/footer') %>

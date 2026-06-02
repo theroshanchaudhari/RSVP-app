@@ -1,0 +1,149 @@
+<%- include('partials/header', { title: 'Edit RSVP' }) %>
+
+<div class="container py-5" style="max-width:700px;">
+  <div class="text-center mb-4">
+    <h1 class="text-purple fw-bold"><i class="bi bi-pencil-square me-2"></i>Edit Your RSVP</h1>
+    <h5 class="text-muted"><%= event.name %></h5>
+  </div>
+
+  <% if (isDuplicate) { %>
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    We found an existing RSVP with your email or phone. You can update it below.
+  </div>
+  <% } %>
+
+  <% if (errors && errors.length > 0) { %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% errors.forEach(e => { %><li><%= e %></li><% }) %>
+    </ul>
+  </div>
+  <% } %>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <form action="/rsvp/edit/<%= guest.edit_token %>" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- Attendance -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">Will you be attending? <span class="text-danger">*</span></label>
+          <div class="d-flex gap-3 flex-wrap">
+            <div class="form-check form-check-card">
+              <input class="form-check-input" type="radio" name="attending" id="att-yes" value="yes"
+                     <%= (guest.attending === 'yes') ? 'checked' : '' %> required>
+              <label class="form-check-label btn btn-outline-success px-4 py-2" for="att-yes">
+                <i class="bi bi-check-circle me-2"></i>Yes, I'll be there!
+              </label>
+            </div>
+            <div class="form-check form-check-card">
+              <input class="form-check-input" type="radio" name="attending" id="att-no" value="no"
+                     <%= (guest.attending === 'no') ? 'checked' : '' %> required>
+              <label class="form-check-label btn btn-outline-danger px-4 py-2" for="att-no">
+                <i class="bi bi-x-circle me-2"></i>Sorry, can't make it
+              </label>
+            </div>
+            <div class="form-check form-check-card">
+              <input class="form-check-input" type="radio" name="attending" id="att-maybe" value="maybe"
+                     <%= (guest.attending === 'maybe') ? 'checked' : '' %> required>
+              <label class="form-check-label btn btn-outline-warning px-4 py-2" for="att-maybe">
+                <i class="bi bi-question-circle me-2"></i>Maybe
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <h6 class="text-purple fw-bold mb-3"><i class="bi bi-person me-2"></i>Your Information</h6>
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= guest.name %>" required>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="email" name="email" value="<%= guest.email || '' %>">
+          </div>
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" class="form-control" id="phone" name="phone" value="<%= guest.phone || '' %>">
+          </div>
+        </div>
+
+        <div id="attending-fields">
+          <hr class="my-4">
+          <h6 class="text-purple fw-bold mb-3"><i class="bi bi-people me-2"></i>Party Size</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="adults" class="form-label">Number of Adults</label>
+              <input type="number" class="form-control" id="adults" name="adults" value="<%= guest.adults %>" min="1" max="20">
+            </div>
+            <div class="col-6">
+              <label for="children" class="form-label">Number of Children</label>
+              <input type="number" class="form-control" id="children" name="children" value="<%= guest.children %>" min="0" max="20">
+            </div>
+          </div>
+
+          <hr class="my-4">
+          <h6 class="text-purple fw-bold mb-3"><i class="bi bi-fork-knife me-2"></i>Meal Preferences</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="meal_preference" class="form-label">Meal Preference</label>
+              <select class="form-select" id="meal_preference" name="meal_preference">
+                <option value="">No preference</option>
+                <option value="Vegetarian" <%= guest.meal_preference === 'Vegetarian' ? 'selected' : '' %>>Vegetarian</option>
+                <option value="Vegan" <%= guest.meal_preference === 'Vegan' ? 'selected' : '' %>>Vegan</option>
+                <option value="Non-Vegetarian" <%= guest.meal_preference === 'Non-Vegetarian' ? 'selected' : '' %>>Non-Vegetarian</option>
+                <option value="Jain" <%= guest.meal_preference === 'Jain' ? 'selected' : '' %>>Jain</option>
+                <option value="Gluten-Free" <%= guest.meal_preference === 'Gluten-Free' ? 'selected' : '' %>>Gluten-Free</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="dietary_restrictions" class="form-label">Dietary Restrictions</label>
+              <input type="text" class="form-control" id="dietary_restrictions" name="dietary_restrictions"
+                     value="<%= guest.dietary_restrictions || '' %>">
+            </div>
+          </div>
+
+          <hr class="my-4">
+          <h6 class="text-purple fw-bold mb-3"><i class="bi bi-clock me-2"></i>Arrival Time</h6>
+          <div class="mb-3">
+            <label for="arrival_time" class="form-label">Estimated Arrival Time</label>
+            <input type="text" class="form-control" id="arrival_time" name="arrival_time"
+                   value="<%= guest.arrival_time || '' %>" placeholder="e.g. 11:00 AM">
+          </div>
+        </div>
+
+        <hr class="my-4">
+        <div class="mb-4">
+          <label for="message" class="form-label fw-bold">Message to Host (Optional)</label>
+          <textarea class="form-control" id="message" name="message" rows="3"><%= guest.message || '' %></textarea>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-purple btn-lg">
+            <i class="bi bi-check-circle me-2"></i>Update RSVP
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="text-center mt-3">
+    <a href="/" class="text-muted small"><i class="bi bi-arrow-left me-1"></i>Back to Event Page</a>
+  </div>
+</div>
+
+<script>
+  const radios = document.querySelectorAll('input[name="attending"]');
+  const attendingFields = document.getElementById('attending-fields');
+  function updateFields() {
+    const val = document.querySelector('input[name="attending"]:checked')?.value;
+    attendingFields.style.display = (val === 'no') ? 'none' : '';
+  }
+  radios.forEach(r => r.addEventListener('change', updateFields));
+  updateFields();
+</script>
+
+<%- include('partials/footer') %>

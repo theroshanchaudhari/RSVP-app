@@ -1,0 +1,316 @@
+<%- include('partials/header', { title: 'Settings', activePage: 'settings' }) %>
+
+<div class="mb-4">
+  <h2 class="fw-bold text-purple mb-1"><i class="bi bi-gear me-2"></i>Event Settings</h2>
+  <p class="text-muted mb-0">Configure your event details and preferences</p>
+</div>
+
+<% if (success) { %>
+<div class="alert alert-success alert-dismissible fade show">
+  <i class="bi bi-check-circle me-2"></i>Settings saved successfully!
+  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<% } %>
+
+<form action="/admin/settings" method="POST">
+<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <!-- Nav Tabs -->
+  <ul class="nav nav-tabs mb-4" id="settingsTabs">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-event">Event Info</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-venue">Venue</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-schedule">Schedule & FAQ</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-access">Access & Security</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-admin">Admin Account</a></li>
+  </ul>
+
+  <div class="tab-content">
+
+    <!-- Event Info Tab -->
+    <div class="tab-pane fade show active" id="tab-event">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Event Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="name" value="<%= event.name %>" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" name="description" rows="3"><%= event.description || '' %></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Banner Message</label>
+              <input type="text" class="form-control" name="banner_message" value="<%= event.banner_message || '' %>"
+                     placeholder="Shown on the event landing page">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Event Date</label>
+              <input type="date" class="form-control" name="date" value="<%= event.date || '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Event Time</label>
+              <input type="time" class="form-control" name="time" value="<%= event.time || '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">RSVP Deadline</label>
+              <input type="date" class="form-control" name="rsvp_deadline" value="<%= event.rsvp_deadline || '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Max Guests</label>
+              <input type="number" class="form-control" name="max_guests" value="<%= event.max_guests || '' %>"
+                     placeholder="Leave empty for unlimited" min="1">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Dress Code</label>
+              <input type="text" class="form-control" name="dress_code" value="<%= event.dress_code || '' %>"
+                     placeholder="e.g. Formal, Casual, Traditional">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Puja Timing</label>
+              <input type="text" class="form-control" name="puja_timing" value="<%= event.puja_timing || '' %>"
+                     placeholder="e.g. 10:00 AM">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Lunch Timing</label>
+              <input type="text" class="form-control" name="lunch_timing" value="<%= event.lunch_timing || '' %>"
+                     placeholder="e.g. 12:30 PM">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Venue Tab -->
+    <div class="tab-pane fade" id="tab-venue">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Venue Name</label>
+              <input type="text" class="form-control" name="venue_name" value="<%= event.venue_name || '' %>">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Street Address</label>
+              <input type="text" class="form-control" name="venue_address" value="<%= event.venue_address || '' %>">
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">City</label>
+              <input type="text" class="form-control" name="city" value="<%= event.city || '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">State</label>
+              <input type="text" class="form-control" name="state" value="<%= event.state || '' %>">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">ZIP Code</label>
+              <input type="text" class="form-control" name="zip" value="<%= event.zip || '' %>">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Google Maps URL</label>
+              <input type="url" class="form-control" name="google_maps_url" value="<%= event.google_maps_url || '' %>"
+                     placeholder="https://maps.google.com/...">
+              <div class="form-text">Paste the full Google Maps link. For embed, use the embed URL.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Parking Instructions</label>
+              <textarea class="form-control" name="parking_info" rows="2"><%= event.parking_info || '' %></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Contact Name</label>
+              <input type="text" class="form-control" name="contact_name" value="<%= event.contact_name || '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Contact Email</label>
+              <input type="email" class="form-control" name="contact_email" value="<%= event.contact_email || '' %>">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Contact Phone</label>
+              <input type="tel" class="form-control" name="contact_phone" value="<%= event.contact_phone || '' %>">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule & FAQ Tab -->
+    <div class="tab-pane fade" id="tab-schedule">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-clock me-2 text-purple"></i>Event Schedule / Timeline
+        </div>
+        <div class="card-body p-4">
+          <div id="scheduleList">
+            <% schedule.forEach((item, i) => { %>
+            <div class="row g-2 mb-2 schedule-item">
+              <div class="col-3">
+                <input type="text" class="form-control form-control-sm" placeholder="Time" value="<%= item.time %>"
+                       data-schedule-time>
+              </div>
+              <div class="col-8">
+                <input type="text" class="form-control form-control-sm" placeholder="Description" value="<%= item.description %>"
+                       data-schedule-desc>
+              </div>
+              <div class="col-1">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.schedule-item').remove(); updateScheduleJson()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-outline-purple btn-sm mt-2" onclick="addScheduleItem()">
+            <i class="bi bi-plus me-1"></i>Add Item
+          </button>
+          <input type="hidden" name="schedule_json" id="scheduleJson" value="<%= JSON.stringify(schedule) %>">
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white fw-bold">
+          <i class="bi bi-question-circle me-2 text-purple"></i>FAQ
+        </div>
+        <div class="card-body p-4">
+          <div id="faqList">
+            <% faq.forEach((item, i) => { %>
+            <div class="mb-3 faq-item border rounded p-3">
+              <div class="mb-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Question" value="<%= item.question %>"
+                       data-faq-q>
+              </div>
+              <div class="mb-1">
+                <textarea class="form-control form-control-sm" placeholder="Answer" rows="2"
+                          data-faq-a><%= item.answer %></textarea>
+              </div>
+              <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.faq-item').remove(); updateFaqJson()">
+                <i class="bi bi-trash me-1"></i>Remove
+              </button>
+            </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-outline-purple btn-sm mt-2" onclick="addFaqItem()">
+            <i class="bi bi-plus me-1"></i>Add FAQ
+          </button>
+          <input type="hidden" name="faq_json" id="faqJson" value="<%= JSON.stringify(faq) %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- Access & Security Tab -->
+    <div class="tab-pane fade" id="tab-access">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="mb-4">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="inviteOnly" name="invite_only"
+                     <%= event.invite_only ? 'checked' : '' %>>
+              <label class="form-check-label fw-bold" for="inviteOnly">Invite-Only Mode</label>
+            </div>
+            <p class="text-muted small">When enabled, only guests with a personal invite link can RSVP.</p>
+          </div>
+
+          <div class="mb-4">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="passwordProtected" name="password_protected"
+                     <%= event.password_protected ? 'checked' : '' %>>
+              <label class="form-check-label fw-bold" for="passwordProtected">Password-Protected Event Page</label>
+            </div>
+            <p class="text-muted small mb-2">Require a password to view the event landing page.</p>
+            <div class="col-md-6">
+              <label class="form-label">Event Page Password</label>
+              <input type="text" class="form-control" name="event_password" value="<%= event.event_password || '' %>"
+                     placeholder="Set a password for the event page">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Account Tab -->
+    <div class="tab-pane fade" id="tab-admin">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Admin Email</label>
+              <input type="email" class="form-control" name="admin_email" value="<%= event.admin_email %>">
+              <div class="form-text">Used for host notifications and login.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" name="new_password" placeholder="Leave blank to keep current">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mt-4">
+    <button type="submit" class="btn btn-purple btn-lg" onclick="syncDynamicFields()">
+      <i class="bi bi-save me-2"></i>Save All Settings
+    </button>
+  </div>
+</form>
+
+<script>
+function addScheduleItem() {
+  const list = document.getElementById('scheduleList');
+  const div = document.createElement('div');
+  div.className = 'row g-2 mb-2 schedule-item';
+  div.innerHTML = `
+    <div class="col-3"><input type="text" class="form-control form-control-sm" placeholder="Time" data-schedule-time></div>
+    <div class="col-8"><input type="text" class="form-control form-control-sm" placeholder="Description" data-schedule-desc></div>
+    <div class="col-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.schedule-item').remove(); updateScheduleJson()"><i class="bi bi-x"></i></button></div>
+  `;
+  list.appendChild(div);
+}
+
+function updateScheduleJson() {
+  const items = [];
+  document.querySelectorAll('.schedule-item').forEach(row => {
+    const time = row.querySelector('[data-schedule-time]')?.value || '';
+    const description = row.querySelector('[data-schedule-desc]')?.value || '';
+    if (time || description) items.push({ time, description });
+  });
+  document.getElementById('scheduleJson').value = JSON.stringify(items);
+}
+
+function addFaqItem() {
+  const list = document.getElementById('faqList');
+  const div = document.createElement('div');
+  div.className = 'mb-3 faq-item border rounded p-3';
+  div.innerHTML = `
+    <div class="mb-2"><input type="text" class="form-control form-control-sm" placeholder="Question" data-faq-q></div>
+    <div class="mb-1"><textarea class="form-control form-control-sm" placeholder="Answer" rows="2" data-faq-a></textarea></div>
+    <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.faq-item').remove(); updateFaqJson()"><i class="bi bi-trash me-1"></i>Remove</button>
+  `;
+  list.appendChild(div);
+}
+
+function updateFaqJson() {
+  const items = [];
+  document.querySelectorAll('.faq-item').forEach(row => {
+    const question = row.querySelector('[data-faq-q]')?.value || '';
+    const answer = row.querySelector('[data-faq-a]')?.value || '';
+    if (question || answer) items.push({ question, answer });
+  });
+  document.getElementById('faqJson').value = JSON.stringify(items);
+}
+
+function syncDynamicFields() {
+  updateScheduleJson();
+  updateFaqJson();
+}
+
+// Auto-update on input change
+document.querySelectorAll('[data-schedule-time], [data-schedule-desc]').forEach(el => {
+  el.addEventListener('change', updateScheduleJson);
+});
+document.querySelectorAll('[data-faq-q], [data-faq-a]').forEach(el => {
+  el.addEventListener('change', updateFaqJson);
+});
+</script>
+
+<%- include('partials/footer') %>
