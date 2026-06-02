@@ -12,12 +12,12 @@ const {
 } = require('../models/queries');
 const { sendConfirmationEmail, sendHostNotification } = require('../services/emailService');
 const { generateQRCode } = require('../services/qrService');
-
-const APP_URL = process.env.APP_URL || 'http://localhost:3000';
+const { getAppUrl } = require('../utils/appUrl');
 
 async function showLanding(req, res) {
   const event = getEvent(1);
-  const rsvpUrl = `${APP_URL}/rsvp`;
+  const appUrl = getAppUrl(req);
+  const rsvpUrl = `${appUrl}/rsvp`;
   let qrCode = null;
   try {
     qrCode = await generateQRCode(rsvpUrl);
@@ -33,7 +33,7 @@ async function showLanding(req, res) {
     return res.render('event-password', { event, error: null });
   }
 
-  res.render('index', { event, qrCode, rsvpUrl, schedule, faq, APP_URL });
+  res.render('index', { event, qrCode, rsvpUrl, schedule, faq, APP_URL: appUrl });
 }
 
 function verifyEventPassword(req, res) {
@@ -126,11 +126,12 @@ async function submitRsvp(req, res) {
   }
 
   const guest = getGuestByEditToken(editToken);
-  const editUrl = `${APP_URL}/rsvp/edit/${editToken}`;
+  const appUrl = getAppUrl(req);
+  const editUrl = `${appUrl}/rsvp/edit/${editToken}`;
 
   // Send emails (non-blocking)
-  sendConfirmationEmail(guest, event).catch(console.error);
-  sendHostNotification(guest, event).catch(console.error);
+  sendConfirmationEmail(guest, event, appUrl).catch(console.error);
+  sendHostNotification(guest, event, appUrl).catch(console.error);
 
   res.render('rsvp-confirm', { event, guest, editUrl });
 }
@@ -185,10 +186,11 @@ async function updateRsvp(req, res) {
   });
 
   const updatedGuest = getGuestByEditToken(token);
-  const editUrl = `${APP_URL}/rsvp/edit/${token}`;
+  const appUrl = getAppUrl(req);
+  const editUrl = `${appUrl}/rsvp/edit/${token}`;
 
   // Send updated confirmation
-  sendConfirmationEmail(updatedGuest, event).catch(console.error);
+  sendConfirmationEmail(updatedGuest, event, appUrl).catch(console.error);
 
   res.render('rsvp-confirm', { event, guest: updatedGuest, editUrl });
 }

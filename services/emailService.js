@@ -2,6 +2,7 @@
 
 const nodemailer = require('nodemailer');
 const { getEvent, getAllGuests, getGuestStats } = require('../models/queries');
+const { getAppUrl } = require('../utils/appUrl');
 
 function createTransport() {
   return nodemailer.createTransport({
@@ -15,14 +16,13 @@ function createTransport() {
   });
 }
 
-const APP_URL = process.env.APP_URL || 'http://localhost:3000';
 const FROM = process.env.EMAIL_FROM || 'RSVP App <noreply@rsvp-app.com>';
 
-async function sendConfirmationEmail(guest, event) {
+async function sendConfirmationEmail(guest, event, appUrl = getAppUrl()) {
   if (!guest.email || !process.env.SMTP_USER) return;
 
   const transporter = createTransport();
-  const editUrl = `${APP_URL}/rsvp/edit/${guest.edit_token}`;
+  const editUrl = `${appUrl}/rsvp/edit/${guest.edit_token}`;
 
   const attendingText = guest.attending === 'yes'
     ? `We're thrilled you're coming!`
@@ -61,7 +61,7 @@ async function sendConfirmationEmail(guest, event) {
   });
 }
 
-async function sendHostNotification(guest, event) {
+async function sendHostNotification(guest, event, appUrl = getAppUrl()) {
   if (!event.admin_email || !process.env.SMTP_USER) return;
 
   const transporter = createTransport();
@@ -86,20 +86,20 @@ async function sendHostNotification(guest, event) {
           ${guest.dietary_restrictions ? `<tr><td style="padding: 6px; border: 1px solid #ddd;"><strong>Dietary</strong></td><td style="padding: 6px; border: 1px solid #ddd;">${guest.dietary_restrictions}</td></tr>` : ''}
           ${guest.message ? `<tr><td style="padding: 6px; border: 1px solid #ddd;"><strong>Message</strong></td><td style="padding: 6px; border: 1px solid #ddd;">${guest.message}</td></tr>` : ''}
         </table>
-        <p><a href="${APP_URL}/admin/guests/${guest.id}" style="color: #7c3aed;">View in Admin Dashboard</a></p>
+        <p><a href="${appUrl}/admin/guests/${guest.id}" style="color: #7c3aed;">View in Admin Dashboard</a></p>
       </div>
     `
   });
 }
 
-async function sendReminderEmail(guest, event) {
+async function sendReminderEmail(guest, event, appUrl = getAppUrl()) {
   if (!guest.email || !process.env.SMTP_USER) return;
   if (guest.attending !== 'pending' && guest.attending !== null) return;
 
   const transporter = createTransport();
   const rsvpUrl = guest.invite_token
-    ? `${APP_URL}/rsvp?token=${guest.invite_token}`
-    : `${APP_URL}/rsvp`;
+    ? `${appUrl}/rsvp?token=${guest.invite_token}`
+    : `${appUrl}/rsvp`;
 
   await transporter.sendMail({
     from: FROM,
@@ -142,7 +142,7 @@ async function sendDailySummary() {
           <tr><td style="padding: 6px; border: 1px solid #ddd;"><strong>Total Adults</strong></td><td style="padding: 6px; border: 1px solid #ddd;">${stats.adults}</td></tr>
           <tr><td style="padding: 6px; border: 1px solid #ddd;"><strong>Total Children</strong></td><td style="padding: 6px; border: 1px solid #ddd;">${stats.children}</td></tr>
         </table>
-        <p><a href="${APP_URL}/admin" style="color: #7c3aed;">View Full Dashboard</a></p>
+        <p><a href="${getAppUrl()}/admin" style="color: #7c3aed;">View Full Dashboard</a></p>
       </div>
     `
   });

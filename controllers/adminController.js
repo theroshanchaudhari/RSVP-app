@@ -12,8 +12,7 @@ const {
 } = require('../models/queries');
 const { sendReminderEmail } = require('../services/emailService');
 const { generateQRCode } = require('../services/qrService');
-
-const APP_URL = process.env.APP_URL || 'http://localhost:3000';
+const { getAppUrl } = require('../utils/appUrl');
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -62,7 +61,8 @@ async function dashboard(req, res) {
   const event = getEvent(1);
   const stats = getGuestStats(1);
   const recentGuests = getAllGuests(1).slice(0, 10);
-  const rsvpUrl = `${APP_URL}/rsvp`;
+  const appUrl = getAppUrl(req);
+  const rsvpUrl = `${appUrl}/rsvp`;
   let qrCode = null;
   try { qrCode = await generateQRCode(rsvpUrl); } catch (_) {}
   res.render('admin/dashboard', { event, stats, recentGuests, qrCode, rsvpUrl });
@@ -87,7 +87,7 @@ function showGuest(req, res) {
   const event = getEvent(1);
   const guest = getGuestById(req.params.id);
   if (!guest) return res.status(404).render('error', { event, message: 'Guest not found.' });
-  const editUrl = `${APP_URL}/rsvp/edit/${guest.edit_token}`;
+  const editUrl = `${getAppUrl(req)}/rsvp/edit/${guest.edit_token}`;
   res.render('admin/guest-detail', { event, guest, editUrl });
 }
 
@@ -187,7 +187,7 @@ async function sendReminder(req, res) {
   const guest = getGuestById(req.params.id);
   if (!guest) return res.status(404).json({ error: 'Guest not found' });
   try {
-    await sendReminderEmail(guest, event);
+    await sendReminderEmail(guest, event, getAppUrl(req));
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -230,7 +230,7 @@ async function exportCsv(req, res) {
 async function invitationList(req, res) {
   const event = getEvent(1);
   const invitations = getAllInvitations(1);
-  res.render('admin/invitations', { event, invitations, APP_URL });
+  res.render('admin/invitations', { event, invitations, appUrl: getAppUrl(req) });
 }
 
 async function showAddInvitation(req, res) {
@@ -270,7 +270,7 @@ async function getInvitationQR(req, res) {
   const invitations = getAllInvitations(1);
   const inv = invitations.find(i => i.id === parseInt(id));
   if (!inv) return res.status(404).send('Not found');
-  const url = `${APP_URL}/rsvp?token=${inv.invite_token}`;
+  const url = `${getAppUrl(req)}/rsvp?token=${inv.invite_token}`;
   const qr = await generateQRCode(url);
   res.json({ qr, url });
 }
