@@ -37,7 +37,7 @@ function initDB() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS events (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL DEFAULT 'My Event',
+      name TEXT NOT NULL DEFAULT 'Vastu Pooja',
       date TEXT,
       time TEXT,
       venue_name TEXT,
