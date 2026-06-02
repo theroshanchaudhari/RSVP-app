@@ -1,6 +1,14 @@
 'use strict';
 
-const { DatabaseSync } = require('node:sqlite');
+let DatabaseSync;
+try {
+  ({ DatabaseSync } = require('node:sqlite'));
+} catch (err) {
+  throw new Error(
+    'This app requires Node.js 22.5+ because it uses node:sqlite. ' +
+    `Current runtime: ${process.version}. Original error: ${err.message}`
+  );
+}
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
