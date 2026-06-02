@@ -3,6 +3,48 @@
   --purple: #7c3aed;
   --purple-dark: #5b21b6;
   --purple-light: #ede9fe;
+  --font-title: 'Playfair Display', Georgia, serif;
+  --font-body: 'Montserrat', Arial, sans-serif;
+}
+
+/* ─── Typography ─────────────────────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  letter-spacing: 0;
+}
+
+h1,
+h2,
+h3,
+.display-1,
+.display-2,
+.display-3,
+.display-4,
+.display-5,
+.display-6,
+.card-title,
+.modal-title {
+  font-family: var(--font-title);
+  font-weight: 700;
+}
+
+h4,
+h5,
+h6,
+.navbar-brand,
+.admin-sidebar .fs-5 {
+  font-family: var(--font-title);
+  font-weight: 600;
+}
+
+button,
+input,
+select,
+textarea,
+.btn,
+.form-control,
+.form-select {
+  font-family: var(--font-body);
 }
 
 /* ─── Utilities ──────────────────────────────────────────────── */
@@ -39,7 +81,9 @@
 
 /* ─── Hero Section ───────────────────────────────────────────── */
 .hero-section {
-  background: linear-gradient(135deg, var(--purple) 0%, #a855f7 50%, #ec4899 100%);
+  background:
+    linear-gradient(rgba(30, 27, 75, 0.54), rgba(30, 27, 75, 0.54)),
+    url('/media/kseniya-lapteva-A4rqd2g-eLo-unsplash.jpg') center / cover no-repeat;
   min-height: 60vh;
   display: flex;
   align-items: center;
