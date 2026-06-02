@@ -49,14 +49,14 @@
             <td class="pe-3">
               <div class="d-flex gap-1 flex-wrap">
                 <button class="btn btn-outline-secondary btn-xs" title="Copy link"
-                        onclick="copyInviteLink('<%= appUrl %>/rsvp?token=<%= inv.invite_token %>')">
+                        onclick="copyInviteLink('<%= appUrl %>/?token=<%= inv.invite_token %>')">
                   <i class="bi bi-clipboard"></i>
                 </button>
                 <button class="btn btn-outline-info btn-xs" title="Show QR code"
                         onclick="showQR(<%= inv.id %>)">
                   <i class="bi bi-qr-code"></i>
                 </button>
-                <a href="<%= appUrl %>/rsvp?token=<%= inv.invite_token %>" target="_blank"
+                <a href="<%= appUrl %>/?token=<%= inv.invite_token %>" target="_blank"
                    class="btn btn-outline-primary btn-xs" title="Open link">
                   <i class="bi bi-box-arrow-up-right"></i>
                 </a>

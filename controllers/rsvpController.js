@@ -14,10 +14,17 @@ const { sendConfirmationEmail, sendHostNotification } = require('../services/ema
 const { generateQRCode } = require('../services/qrService');
 const { getAppUrl } = require('../utils/appUrl');
 
+function safeReturnTo(path) {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//') ? path : '/';
+}
+
 async function showLanding(req, res) {
   const event = getEvent(1);
   const appUrl = getAppUrl(req);
-  const rsvpUrl = `${appUrl}/rsvp`;
+  const { token } = req.query;
+  const invitation = token ? getInvitationByToken(token) : null;
+  const inviteQuery = invitation ? `?token=${encodeURIComponent(invitation.invite_token)}` : '';
+  const rsvpUrl = `${appUrl}/rsvp${inviteQuery}`;
   let qrCode = null;
   try {
     qrCode = await generateQRCode(rsvpUrl);
@@ -30,20 +37,24 @@ async function showLanding(req, res) {
 
   // Check event password
   if (event.password_protected && !req.session.eventAccessGranted) {
-    return res.render('event-password', { event, error: null });
+    return res.render('event-password', { event, error: null, returnTo: req.originalUrl });
   }
 
-  res.render('index', { event, qrCode, rsvpUrl, schedule, faq, APP_URL: appUrl });
+  res.render('index', { event, invitation, qrCode, rsvpUrl, schedule, faq, APP_URL: appUrl });
 }
 
 function verifyEventPassword(req, res) {
   const event = getEvent(1);
-  const { password } = req.body;
+  const { password, returnTo } = req.body;
   if (password === event.event_password) {
     req.session.eventAccessGranted = true;
-    return res.redirect('/');
+    return res.redirect(safeReturnTo(returnTo));
   }
-  res.render('event-password', { event, error: 'Incorrect password. Please try again.' });
+  res.render('event-password', {
+    event,
+    error: 'Incorrect password. Please try again.',
+    returnTo: safeReturnTo(returnTo)
+  });
 }
 
 async function showRsvpForm(req, res) {

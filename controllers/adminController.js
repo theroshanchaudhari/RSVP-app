@@ -270,7 +270,7 @@ async function getInvitationQR(req, res) {
   const invitations = getAllInvitations(1);
   const inv = invitations.find(i => i.id === parseInt(id));
   if (!inv) return res.status(404).send('Not found');
-  const url = `${getAppUrl(req)}/rsvp?token=${inv.invite_token}`;
+  const url = `${getAppUrl(req)}/?token=${inv.invite_token}`;
   const qr = await generateQRCode(url);
   res.json({ qr, url });
 }

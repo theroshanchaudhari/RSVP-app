@@ -98,7 +98,7 @@ async function sendReminderEmail(guest, event, appUrl = getAppUrl()) {
 
   const transporter = createTransport();
   const rsvpUrl = guest.invite_token
-    ? `${appUrl}/rsvp?token=${guest.invite_token}`
+    ? `${appUrl}/?token=${guest.invite_token}`
     : `${appUrl}/rsvp`;
 
   await transporter.sendMail({
